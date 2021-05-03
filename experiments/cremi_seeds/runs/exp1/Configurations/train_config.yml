@@ -1,0 +1,77 @@
+device: cuda
+git_rev: f7be9482eabe384905e6ac56a6d2897828203be0
+model:
+  model_class: confnets.models.UNet3d
+  model_kwargs:
+    depth: 3
+    final_activation: Sigmoid
+    fmaps:
+    - 32
+    - 64
+    - 128
+    - 256
+    in_channels: 2
+    number_multiscale_inputs: 1
+    out_channels: 1
+    res_blocks_specs:
+    - - true
+    - - true
+    - - true
+    - - true
+    res_blocks_specs_decoder:
+    - - true
+    - - true
+    - - true
+    - - true
+    scale_factor:
+    - 1
+    - 2
+    - 2
+    upsampling_mode: nearest
+trainer:
+  callbacks:
+    essentials:
+      GarbageCollection: {}
+      SaveAtBestValidationScore:
+        smoothness: 0
+        verbose: true
+    scheduling:
+      AutoLR:
+        consider_improvement_with_respect_to: previous
+        factor: 0.99
+        monitor: validation_loss
+        monitor_momentum: 0.75
+        monitor_while: validating
+        patience: 100 iterations
+        verbose: true
+  criterion:
+    kwargs: {}
+    loss name: nn.Module.BCELoss
+  intervals:
+    save_every:
+    - 1000
+    - iterations
+    validate_every:
+      for_num_iterations: 5
+      frequency:
+      - 100
+      - iterations
+  max_epochs: 999
+  num_targets: 1
+  optimizer:
+    Adam:
+      amsgrad: true
+      lr: 0.0001
+      weight_decay: 0.0005
+  tensorboard:
+    log_histograms_every: never
+    log_images_every:
+    - 500
+    - iterations
+    log_scalars_every:
+    - 1
+    - iterations
+    send_image_at_batch_indices:
+    - 0
+    send_image_at_channel_indices:
+    - 0

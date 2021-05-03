@@ -1,0 +1,73 @@
+# Use "KeyDeleter" string if you want to delete a parameter that was set from an inherited config.
+
+device: cuda
+
+model:
+  model_class: confnets.models.UNet3d
+  model_kwargs:
+    in_channels: 2
+    out_channels: 1
+    final_activation: "Sigmoid"
+    depth: 3
+    upsampling_mode: 'nearest'
+    res_blocks_specs: [[True], [True], [True], [True]]
+    res_blocks_specs_decoder: [[True], [True], [True], [True]]
+    fmaps: [32, 64, 128, 256]
+#    return_input: True
+    number_multiscale_inputs: 1
+    scale_factor: [1, 2, 2]
+
+
+trainer:
+  max_epochs: 999 # basically infinite
+  num_targets: 1
+
+  criterion:
+    #loss_name: "inferno.extensions.criteria.set_similarity_measures.SorensenDiceLoss"
+    loss name: "nn.Module.BCELoss"
+    kwargs: {}
+
+  optimizer:
+    Adam:
+      lr: 0.0001
+      weight_decay: 0.0005
+      amsgrad: True
+#      betas: [0.9, 0.999]
+
+  intervals:
+    save_every: [1000, 'iterations']
+    validate_every:
+      frequency : [100, 'iterations']
+      for_num_iterations: 5
+
+  tensorboard:
+    log_scalars_every: [1, 'iterations']
+    log_images_every: [500, 'iterations']
+    log_histograms_every: 'never'
+    send_image_at_batch_indices: [0]
+    send_image_at_channel_indices: [0]
+
+  callbacks:
+#    gradients:
+#      LogOutputGradients:
+#        frequency: 1
+
+    essentials:
+      SaveAtBestValidationScore:
+        smoothness: 0
+        verbose: True
+      GarbageCollection: {}
+#      GradientClip:
+#        clip_value: 1e-3
+
+    scheduling:
+      AutoLR:
+        monitor: 'validation_loss'
+        factor: 0.99
+        patience: '100 iterations'
+        monitor_while: 'validating'
+        monitor_momentum: 0.75
+#        cooldown_duration: '50000 iterations'
+        consider_improvement_with_respect_to: 'previous'
+        verbose: True
+
