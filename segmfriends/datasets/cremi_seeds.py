@@ -41,7 +41,7 @@ class CremiSeedDataset(Dataset):
         f = h5py.File(self.path, 'r')
         assert 'input' in f.keys()
         assert 'seeds' in f.keys()
-        self.slice_iter = list(slidingwindowslices(shape=f['seeds'].shape, window_size=(8, 320, 320), strides=(2,100,100)))
+        self.slice_iter = list(slidingwindowslices(shape=f['seeds'].shape, window_size=(8, 256, 256), strides=(2,100,100)))
         f.close()
         self.transforms = self.data_transforms()
 

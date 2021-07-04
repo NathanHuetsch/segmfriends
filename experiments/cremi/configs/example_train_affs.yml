@@ -86,6 +86,7 @@ loaders:
       ignore_label: 0
 
       affinity_config:
+        # segmentation is converted into binary affinity maps
         0:
           retain_mask: True # This keep a mask of the valid affinities (not involving the ignore-label)
           retain_segmentation: True # This keeps the label image as the first channel in the target tensor
@@ -275,6 +276,8 @@ trainer:
     kwargs: {}
     transforms:
       - neurofire.criteria.loss_transforms.RemoveSegmentationFromTarget: {}
+
+      # takes care of ignore_label pixels before loss is applied
       - segmfriends.transform.volume.ApplyAndRemoveMask: {first_invert_target: True}
 
   optimizer:
@@ -322,7 +325,8 @@ trainer:
         verbose: True
 
 
-
+# discuss questions with Roman
+# log anywhere function and visualize for debugging
 firelight:
   affinities:
     ImageGridVisualizer:

@@ -16,6 +16,8 @@ model:
 #    return_input: True
     number_multiscale_inputs: 1
     scale_factor: [1, 2, 2]
+    norm_type: BatchNorm3d
+    loadfrom: '/home/nhuetsch/Desktop/github/segmfriends/experiments/cremi_seeds/runs/exp1/best_checkpoint.pytorch'
 
 
 trainer:
@@ -23,8 +25,8 @@ trainer:
   num_targets: 1
 
   criterion:
-    #loss_name: "inferno.extensions.criteria.set_similarity_measures.SorensenDiceLoss"
-    loss name: "nn.Module.BCELoss"
+    loss_name: "inferno.extensions.criteria.set_similarity_measures.SorensenDiceLoss"
+    #loss name: "nn.Module.BCELoss"
     kwargs: {}
 
   optimizer:
