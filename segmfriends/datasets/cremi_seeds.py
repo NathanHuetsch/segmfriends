@@ -41,7 +41,7 @@ class CremiSeedDataset(Dataset):
         f = h5py.File(self.path, 'r')
         assert 'input' in f.keys()
         assert 'seeds' in f.keys()
-        self.slice_iter = list(slidingwindowslices(shape=f['seeds'].shape, window_size=(8, 256, 256), strides=(2,100,100)))
+        self.slice_iter = list(slidingwindowslices(shape=f['seeds'].shape, window_size=(4, 256, 256), strides=(2,100,100)))
         f.close()
         self.transforms = self.data_transforms()
 
@@ -55,6 +55,77 @@ class CremiSeedDataset(Dataset):
         seeds = f['seeds'][slice][np.newaxis,...]
         f.close()
         return input, seeds
+
+    def data_transforms(self):
+        transforms = Compose()
+        transforms.add(RandomFlip3D())
+        transforms.add(RandomRotate())
+        return transforms
+
+class CremiSeedDatasetRAM(Dataset):
+    def __init__(self, path):
+        assert os.path.exists(path)
+        self.path = path
+        f = h5py.File(self.path, 'r')
+        assert 'input' in f.keys()
+        assert 'seeds' in f.keys()
+        self.slice_iter = list(slidingwindowslices(shape=[100, 1280, 1280], window_size=(4, 256, 256), strides=(4, 128, 128)))
+        self.input = np.array(f['input'][:, :100])
+        self.seeds = np.array(f['seeds'][:100])
+        f.close()
+
+    def __len__(self):
+        return len(self.slice_iter)
+
+    def __getitem__(self, item):
+        slice = self.slice_iter[item]
+        inp = np.stack((self.input[1][slice], self.input[0][slice]), axis=0)
+        seeds = self.seeds[slice][np.newaxis, ...]
+        return inp, seeds
+
+class CremiSeedValset(Dataset):
+    def __init__(self, path):
+        assert os.path.exists(path)
+        self.path = path
+        f = h5py.File(self.path, 'r')
+        assert 'input' in f.keys()
+        assert 'seeds' in f.keys()
+        self.slice_iter = list(slidingwindowslices(shape=[20, 1280, 1280], window_size=(4, 256, 256), strides=(4, 128, 128)))
+        self.input = np.array(f['input'][:, 100:])
+        self.seeds = np.array(f['seeds'][100:])
+        f.close()
+
+    def __len__(self):
+        return len(self.slice_iter)
+
+    def __getitem__(self, item):
+        slice = self.slice_iter[item]
+        inp = np.stack((self.input[1][slice], self.input[0][slice]), axis=0)
+        seeds = self.seeds[slice][np.newaxis, ...]
+        return inp, seeds
+
+
+class CremiSeedInferenceRAM(Dataset):
+    def __init__(self, path):
+        assert os.path.exists(path)
+        self.path = path
+        f = h5py.File(self.path, 'r')
+        assert 'input' in f.keys()
+        assert 'seeds' in f.keys()
+        self.slice_iter = list(slidingwindowslices(shape=f['seeds'].shape, window_size=(8, 256, 256), strides=(8,256,256)))
+        self.input = np.stack((f['input'][0], f['input'][1]), axis=0)
+        self.seeds = np.array(f['seeds'])
+        f.close()
+        self.transforms = self.data_transforms()
+
+    def __len__(self):
+        return len(self.slice_iter)
+
+    def __getitem__(self, item):
+        slice = self.slice_iter[item]
+        inp = np.stack((self.input[1][slice], self.input[0][slice]), axis=0)
+        seeds = self.seeds[slice][np.newaxis, ...]
+        return inp, seeds
 
     def data_transforms(self):
         transforms = Compose()

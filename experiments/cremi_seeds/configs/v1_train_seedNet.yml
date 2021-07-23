@@ -10,14 +10,11 @@ model:
     final_activation: "Sigmoid"
     depth: 3
     upsampling_mode: 'nearest'
-    res_blocks_specs: [[True], [True], [True], [True]]
-    res_blocks_specs_decoder: [[True], [True], [True], [True]]
-    fmaps: [32, 64, 128, 256]
-#    return_input: True
+    fmaps: [32, 64, 128, 128]
     number_multiscale_inputs: 1
     scale_factor: [1, 2, 2]
     norm_type: BatchNorm3d
-    loadfrom: '/home/nhuetsch/Desktop/github/segmfriends/experiments/cremi_seeds/runs/exp0/checkpoint.pytorch'
+    #loadfrom: '/home/nhuetsch/Desktop/github/segmfriends/experiments/cremi_seeds/runs/exp0/checkpoint.pytorch'
 
 
 trainer:
@@ -26,8 +23,12 @@ trainer:
 
   criterion:
     loss_name: "inferno.extensions.criteria.set_similarity_measures.SorensenDiceLoss"
-    #loss name: "nn.Module.BCELoss"
     kwargs: {}
+    #transforms:
+    #  - neurofire.criteria.loss_transforms.RemoveSegmentationFromTarget: {}
+
+      # takes care of ignore_label pixels before loss is applied
+    #  - segmfriends.transform.volume.ApplyAndRemoveMask: {first_invert_target: True}
 
   optimizer:
     Adam:

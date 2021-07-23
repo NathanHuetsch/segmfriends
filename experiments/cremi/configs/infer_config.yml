@@ -25,7 +25,7 @@ loaders:
       shuffle: False
 
     # Which CREMI sample should be used for inference:
-    name: C
+    name: A
 
     volume_config:
       # Sliding window size

@@ -17,7 +17,7 @@ model:
     number_multiscale_inputs: 1
     scale_factor: [1, 2, 2]
     norm_type: BatchNorm3d
-    loadfrom: '/home/nhuetsch/Desktop/github/segmfriends/experiments/cremi_seeds/runs/exp1/best_checkpoint.pytorch'
+    loadfrom: '/home/nhuetsch/Desktop/github/segmfriends/experiments/cremi_seeds/runs/exp0/checkpoint.pytorch'
 
 
 trainer:
